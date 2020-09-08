@@ -2,33 +2,7 @@ var http = require("http");
 var fs = require("fs");
 var url = require("url");
 var qs = require("querystring");
-
-function templateHTML(title, list, body, control) {
-  return `<!DOCTYPE html>
-          <html>
-          <head>
-              <title>WEB1 - ${title}</title>
-              <meta charset="utf-8" />
-          </head>
-          <body>
-              <h1><a href="/">WEB</a></h1>
-              ${list}
-              ${control}
-              ${body}
-          </body>
-          </html>`;
-}
-
-function templateList(filelist) {
-  var list = "<ul>";
-  var i = 0;
-  while (i < filelist.length) {
-    list = list + `<li><a href="/?id=${filelist[i]}">${filelist[i]}</a></li>`;
-    i++;
-  }
-  list = list + "</ul>";
-  return list;
-}
+var template = require("./lib/template.js");
 
 var app = http.createServer((request, response) => {
   var _url = request.url;
@@ -40,8 +14,8 @@ var app = http.createServer((request, response) => {
       fs.readdir("./data", (error, filelist) => {
         var title = "Welcome";
         var description = "Hello, Node.js";
-        var list = templateList(filelist);
-        var template = templateHTML(
+        var list = template.list(filelist);
+        var html = template.html(
           title,
           list,
           `<h2>${title}</h2>${description}`,
@@ -49,30 +23,35 @@ var app = http.createServer((request, response) => {
         );
 
         response.writeHead(200); // 정상적으로 서버 통신이 완료되었을때 받는 값 = 200
-        response.end(template);
+        response.end(html);
       });
     } else {
       fs.readdir("./data", (error, filelist) => {
         fs.readFile(`data/${queryData.id}`, "utf8", (err, description) => {
           var title = queryData.id;
-          var list = templateList(filelist);
-          var template = templateHTML(
+          var list = template.list(filelist);
+          var html = template.html(
             title,
             list,
             `<h2>${title}</h2>${description}`,
-            `<a href="/create">create</a> <a href="/update?id=${title}">update</a>`
+            `<a href="/create">create</a>
+            <a href="/update?id=${title}">update</a>
+            <form action = "delete_process" method = "post" onsubmit="">
+              <input type="hidden" name="id" value="${title}">
+              <input type="submit" value="delete">
+            </form>`
           );
 
           response.writeHead(200); // 정상적으로 서버 통신이 완료되었을때 받는 값 = 200
-          response.end(template);
+          response.end(html);
         });
       });
     }
   } else if (pathname === "/create") {
     fs.readdir("./data", (error, filelist) => {
       var title = "WEB - create";
-      var list = templateList(filelist);
-      var template = templateHTML(
+      var list = template.list(filelist);
+      var html = template.html(
         title,
         list,
         `<form action="/create_process" method="post">
@@ -90,7 +69,7 @@ var app = http.createServer((request, response) => {
       );
 
       response.writeHead(200); // 정상적으로 서버 통신이 완료되었을때 받는 값 = 200
-      response.end(template);
+      response.end(html);
     });
   } else if (pathname === "/create_process") {
     var body = "";
@@ -110,8 +89,8 @@ var app = http.createServer((request, response) => {
     fs.readdir("./data", (error, filelist) => {
       fs.readFile(`data/${queryData.id}`, "utf8", (err, description) => {
         var title = queryData.id;
-        var list = templateList(filelist);
-        var template = templateHTML(
+        var list = template.list(filelist);
+        var html = template.html(
           title,
           list,
           `
@@ -132,7 +111,7 @@ var app = http.createServer((request, response) => {
         );
 
         response.writeHead(200); // 정상적으로 서버 통신이 완료되었을때 받는 값 = 200
-        response.end(template);
+        response.end(html);
       });
     });
   } else if (pathname === "/update_process") {
@@ -152,6 +131,19 @@ var app = http.createServer((request, response) => {
         });
       });
       console.log(post);
+    });
+  } else if (pathname === "/delete_process") {
+    var body = "";
+    request.on("data", function (data) {
+      body = body + data;
+    });
+    request.on("end", function () {
+      var post = qs.parse(body);
+      var id = post.id;
+      fs.unlink(`data/${id}`, (error) => {
+        response.writeHead(302, { Location: `/` });
+        response.end();
+      });
     });
   } else {
     response.writeHead(404); // 파일을 찾을 수 없을 때 서버가 돌려주는 번호 404
