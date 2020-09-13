@@ -5,6 +5,15 @@ var qs = require("querystring");
 var template = require("./lib/template.js"); // Refactoring으로 분리한 template 모듈 호출
 var path = require("path"); // 경로 입력정보에 대한 보안
 var sanitizeHtml = require("sanitize-html"); // 출력정보에 대한 보안
+var mysql = require("mysql");
+var db = mysql.createConnection({
+  host: "localhost",
+  user: "root",
+  password: "black7kg",
+  database: "opentutorials",
+});
+
+db.connect();
 
 var app = http.createServer((request, response) => {
   var _url = request.url;
@@ -13,19 +22,24 @@ var app = http.createServer((request, response) => {
 
   if (pathname === "/") {
     if (queryData.id === undefined) {
-      fs.readdir("./data", (error, filelist) => {
-        var title = "Welcome";
-        var description = "Hello, Node.js";
-        var list = template.list(filelist);
-        var html = template.html(
-          title,
-          list,
-          `<h2>${title}</h2>${description}`,
-          `<a href="/create">create</a>`
-        );
+      // fs.readdir("./data", (error, filelist) => {
+      //   var title = "Welcome";
+      //   var description = "Hello, Node.js";
+      //   var list = template.list(filelist);
+      //   var html = template.html(
+      //     title,
+      //     list,
+      //     `<h2>${title}</h2>${description}`,
+      //     `<a href="/create">create</a>`
+      //   );
 
+      //   response.writeHead(200); // 정상적으로 서버 통신이 완료되었을때 받는 값 = 200
+      //   response.end(html);
+      // });
+      db.query(`SELECT * FROM topic`, function (error, topics) {
+        console.log(topics);
         response.writeHead(200); // 정상적으로 서버 통신이 완료되었을때 받는 값 = 200
-        response.end(html);
+        response.end("Success");
       });
     } else {
       fs.readdir("./data", (error, filelist) => {
@@ -44,7 +58,7 @@ var app = http.createServer((request, response) => {
             <form action = "delete_process" method = "post" onsubmit="">
               <input type="hidden" name="id" value="${sanitizedTitle}">
               <input type="submit" value="delete">
-          </form>`
+            </form>`
           );
 
           response.writeHead(200); // 정상적으로 서버 통신이 완료되었을때 받는 값 = 200
@@ -86,7 +100,9 @@ var app = http.createServer((request, response) => {
       var title = post.title;
       var description = post.description;
       fs.writeFile(`data/${title}`, description, "utf8", (err) => {
-        response.writeHead(302, { Location: `/?id=${title}` });
+        response.writeHead(302, {
+          Location: `/?id=${title}`,
+        });
         response.end();
       });
     });
@@ -134,7 +150,9 @@ var app = http.createServer((request, response) => {
       var description = post.description;
       fs.rename(`data/${id}`, `data/${title}`, (error) => {
         fs.writeFile(`data/${title}`, description, "utf8", (err) => {
-          response.writeHead(302, { Location: `/?id=${title}` });
+          response.writeHead(302, {
+            Location: `/?id=${title}`,
+          });
           response.end();
         });
       });
@@ -150,7 +168,9 @@ var app = http.createServer((request, response) => {
       var id = post.id;
       var filteredId = path.parse(id).base;
       fs.unlink(`data/${filteredId}`, (error) => {
-        response.writeHead(302, { Location: `/` });
+        response.writeHead(302, {
+          Location: `/`,
+        });
         response.end();
       });
     });
