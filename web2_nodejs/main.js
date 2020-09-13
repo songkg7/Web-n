@@ -9,7 +9,7 @@ var mysql = require("mysql");
 var db = mysql.createConnection({
   host: "localhost",
   user: "root",
-  password: "black7kg",
+  password: "black7kg", // 비밀번호에 대한 보안 필요
   database: "opentutorials",
 });
 
@@ -22,45 +22,45 @@ var app = http.createServer((request, response) => {
 
   if (pathname === "/") {
     if (queryData.id === undefined) {
-      // fs.readdir("./data", (error, filelist) => {
-      //   var title = "Welcome";
-      //   var description = "Hello, Node.js";
-      //   var list = template.list(filelist);
-      //   var html = template.html(
-      //     title,
-      //     list,
-      //     `<h2>${title}</h2>${description}`,
-      //     `<a href="/create">create</a>`
-      //   );
-
-      //   response.writeHead(200); // 정상적으로 서버 통신이 완료되었을때 받는 값 = 200
-      //   response.end(html);
-      // });
       db.query(`SELECT * FROM topic`, function (error, topics) {
-        console.log(topics);
+        var title = "Welcome";
+        var description = "Hello, Node.js";
+        var list = template.list(topics);
+        var html = template.html(
+          title,
+          list,
+          `<h2>${title}</h2>${description}`,
+          `<a href="/create">create</a>`
+        );
         response.writeHead(200); // 정상적으로 서버 통신이 완료되었을때 받는 값 = 200
-        response.end("Success");
+        response.end(html);
       });
     } else {
-      fs.readdir("./data", (error, filelist) => {
-        var filteredId = path.parse(queryData.id).base;
-        fs.readFile(`data/${filteredId}`, "utf8", (err, description) => {
-          var title = queryData.id;
-          var sanitizedTitle = sanitizeHtml(title);
-          var sanitizedDescription = sanitizeHtml(description);
-          var list = template.list(filelist);
+      db.query(`SELECT * FROM topic`, function (error, topics) {
+        if (error) {
+          throw error;
+        }
+        db.query(`SELECT * FROM topic WHERE id=?`, [queryData.id], function (
+          error2,
+          topic
+        ) {
+          if (error2) {
+            throw error2;
+          }
+          var title = topic[0].title;
+          var description = topic[0].description;
+          var list = template.list(topics);
           var html = template.html(
-            sanitizedTitle,
+            title,
             list,
-            `<h2>${sanitizedTitle}</h2>${sanitizedDescription}`,
+            `<h2>${title}</h2>${description}`,
             `<a href="/create">create</a>
-            <a href="/update?id=${sanitizedTitle}">update</a>
-            <form action = "delete_process" method = "post" onsubmit="">
-              <input type="hidden" name="id" value="${sanitizedTitle}">
-              <input type="submit" value="delete">
-            </form>`
+              <a href="/update?id=${queryData.id}">update</a>
+              <form action = "delete_process" method = "post" onsubmit="">
+                <input type="hidden" name="id" value="${queryData.id}">
+                <input type="submit" value="delete">
+              </form>`
           );
-
           response.writeHead(200); // 정상적으로 서버 통신이 완료되었을때 받는 값 = 200
           response.end(html);
         });
