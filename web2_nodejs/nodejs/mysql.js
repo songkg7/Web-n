@@ -1,9 +1,10 @@
 var mysql = require("mysql");
+var db_config = require("./config/db_config");
 var connection = mysql.createConnection({
-  host: "localhost",
-  user: "root",
-  password: "black7kg",
-  database: "opentutorials",
+  host: db_config.host,
+  user: db_config.user,
+  password: db_config.password,
+  database: db_config.database,
 });
 
 connection.connect();
