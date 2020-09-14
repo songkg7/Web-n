@@ -6,11 +6,12 @@ var template = require("./lib/template.js"); // Refactoring으로 분리한 temp
 var path = require("path"); // 경로 입력정보에 대한 보안
 var sanitizeHtml = require("sanitize-html"); // 출력정보에 대한 보안
 var mysql = require("mysql");
+var db_config = require("./config/db_config.json"); // json 파일로 분리하여 보안성 확보
 var db = mysql.createConnection({
-  host: "localhost",
-  user: "root",
-  password: "black7kg", // 비밀번호에 대한 보안 필요
-  database: "opentutorials",
+  host: db_config.host,
+  user: db_config.user,
+  password: db_config.password,
+  database: db_config.database,
 });
 
 db.connect();
