@@ -2,6 +2,7 @@ var template = require("./template.js"); // Refactoring으로 분리한 template
 var db = require("../config/db_config.js");
 var url = require("url");
 var qs = require("querystring");
+var sanitizeHtml = require("sanitize-html"); // 보안 처리
 
 exports.home = function (request, response) {
   db.query(`SELECT * FROM topic`, function (error, topics) {
@@ -29,7 +30,7 @@ exports.page = function (request, response) {
     }
     db.query(
       `SELECT * FROM topic LEFT JOIN author ON topic.author_id = author.id WHERE topic.id=?`,
-      [queryData.id],
+      [queryData.id], // 보안 - SQL Injection
       function (error2, topic) {
         if (error2) {
           throw error2;
@@ -40,8 +41,8 @@ exports.page = function (request, response) {
         var html = template.html(
           title,
           list,
-          `<h2>${title}</h2>${description}
-              </p>by ${topic[0].name}<p>
+          `<h2>${sanitizeHtml(title)}</h2>${sanitizeHtml(description)}
+              </p>by ${sanitizeHtml(topic[0].name)}<p>
               `,
           `<a href="/create">create</a>
               <a href="/update?id=${queryData.id}">update</a>
@@ -63,7 +64,7 @@ exports.create = function (request, response) {
       var title = "Create";
       var list = template.list(topics);
       var html = template.html(
-        title,
+        sanitizeHtml(title),
         list,
         `<form action="/create_process" method="post">
             <p>
@@ -94,7 +95,6 @@ exports.create_process = function (request, response) {
   });
   request.on("end", function () {
     var post = qs.parse(body);
-    console.log(post);
     db.query(
       `INSERT INTO topic (title, description, created, author_id)
          VALUES(?, ?, NOW(), ?)`,
@@ -130,21 +130,21 @@ exports.update = function (request, response) {
       db.query(`SELECT * FROM author`, function (error2, authors) {
         var list = template.list(topics);
         var html = template.html(
-          topic[0].title,
+          sanitizeHtml(topic[0].title),
           list,
           `
             <form action="/update_process" method="post">
               <input type="hidden" name="id" value="${topic[0].id}">
               <p>
-                <input type="text" name="title" placeholder="title" value="${
+                <input type="text" name="title" placeholder="title" value="${sanitizeHtml(
                   topic[0].title
-                }"/>
+                )}"/>
               </p>
               <p>
                 <textarea 
-                name="description" placeholder ="description" id="" cols="30" rows="10">${
+                name="description" placeholder ="description" id="" cols="30" rows="10">${sanitizeHtml(
                   topic[0].description
-                }
+                )}
                 </textarea>
               </p>
               <p>
