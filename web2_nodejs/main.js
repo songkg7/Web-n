@@ -1,13 +1,13 @@
-var http = require("http");
-var url = require("url");
+const http = require("http");
+const url = require("url");
 const { authorSelect } = require("./lib/template");
-var topic = require("./lib/topic");
-var author = require("./lib/author");
+const topic = require("./lib/topic");
+const author = require("./lib/author");
 
-var app = http.createServer((request, response) => {
-  var _url = request.url;
-  var queryData = url.parse(_url, true).query;
-  var pathname = url.parse(_url, true).pathname;
+const app = http.createServer((request, response) => {
+  const _url = request.url;
+  const queryData = url.parse(_url, true).query;
+  const pathname = url.parse(_url, true).pathname;
 
   if (pathname === "/") {
     if (queryData.id === undefined) {

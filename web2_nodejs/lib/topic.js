@@ -1,8 +1,8 @@
-var template = require("./template.js"); // Refactoring으로 분리한 template 모듈 호출
-var db = require("../config/db_config.js");
-var url = require("url");
-var qs = require("querystring");
-var sanitizeHtml = require("sanitize-html"); // 보안 처리
+const template = require("./template.js"); // Refactoring으로 분리한 template 모듈 호출
+const db = require("../config/db_config.js");
+const url = require("url");
+const qs = require("querystring");
+const sanitizeHtml = require("sanitize-html"); // 보안 처리
 
 exports.home = function (request, response) {
   db.query(`SELECT * FROM topic`, function (error, topics) {
@@ -41,7 +41,8 @@ exports.page = function (request, response) {
         var html = template.html(
           title,
           list,
-          `<h2>${sanitizeHtml(title)}</h2>${sanitizeHtml(description)}
+          `<h2>${sanitizeHtml(title)}</h2>
+            ${sanitizeHtml(description)}
               </p>by ${sanitizeHtml(topic[0].name)}<p>
               `,
           `<a href="/create">create</a>
