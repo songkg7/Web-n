@@ -7,7 +7,7 @@ var path = require("path");
 var sanitizeHtml = require("sanitize-html");
 
 var app = http.createServer(function (request, response) {
-  var _url = request.url; // 주소를 가져온다
+  var _url = request.url;
   var queryData = url.parse(_url, true).query;
   var pathname = url.parse(_url, true).pathname;
   if (pathname === "/") {
@@ -151,4 +151,4 @@ var app = http.createServer(function (request, response) {
     response.end("Not found");
   }
 });
-app.listen(3000);
+app.listen(3000); // port 생략하면 80으로 접속하게 된다
