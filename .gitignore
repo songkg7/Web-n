@@ -1,6 +1,7 @@
 # security
 config/
 node_modules/
+data/
 
 #Logs and databases#
 *.log
