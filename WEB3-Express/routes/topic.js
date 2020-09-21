@@ -4,8 +4,13 @@ const path = require("path");
 const fs = require("fs");
 const sanitizeHtml = require("sanitize-html");
 const template = require("../lib/template.js");
+const auth = require("../lib/auth");
 
 router.get("/create", (req, res) => {
+  if (!auth.IsOwner(req, res)) {
+    res.redirect("/");
+    return false;
+  }
   let title = "WEB - create";
   let list = template.list(req.list);
   let html = template.HTML(
@@ -22,12 +27,17 @@ router.get("/create", (req, res) => {
             </p>
           </form>
         `,
-    ""
+    "",
+    auth.StatusUI(req, res)
   );
   res.send(html);
 });
 
 router.post("/create_process", (req, res) => {
+  if (!auth.IsOwner(req, res)) {
+    res.redirect("/");
+    return false;
+  }
   let post = req.body;
   let title = post.title;
   let description = post.description;
@@ -37,6 +47,10 @@ router.post("/create_process", (req, res) => {
 });
 
 router.get("/update/:pageId", (req, res) => {
+  if (!auth.IsOwner(req, res)) {
+    res.redirect("/");
+    return false;
+  }
   let filteredId = path.parse(req.params.pageId).base;
   fs.readFile(`data/${filteredId}`, "utf8", (err, description) => {
     let title = req.params.pageId;
@@ -56,13 +70,18 @@ router.get("/update/:pageId", (req, res) => {
           </p>
         </form>
         `,
-      `<a href="/topic/create">create</a> <a href="/topic/update/${title}">update</a>`
+      `<a href="/topic/create">create</a> <a href="/topic/update/${title}">update</a>`,
+      auth.StatusUI(req, res)
     );
     res.send(html);
   });
 });
 
 router.post("/update_process", (req, res) => {
+  if (!auth.IsOwner(req, res)) {
+    res.redirect("/");
+    return false;
+  }
   let post = req.body;
   let id = post.id;
   let title = post.title;
@@ -75,6 +94,10 @@ router.post("/update_process", (req, res) => {
 });
 
 router.post("/delete_process", (req, res) => {
+  if (!auth.IsOwner(req, res)) {
+    res.redirect("/");
+    return false;
+  }
   let post = req.body;
   let id = post.id;
   let filteredId = path.parse(id).base;
@@ -104,7 +127,8 @@ router.get("/:pageId", (req, res, next) => {
             <form action="/topic/delete_process" method="post">
               <input type="hidden" name="id" value="${sanitizedTitle}">
               <input type="submit" value="delete">
-            </form>`
+            </form>`,
+        auth.StatusUI(req, res)
       );
       res.send(html);
     }

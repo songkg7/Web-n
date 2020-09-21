@@ -2,6 +2,7 @@
 config/
 node_modules/
 data/
+sessions/
 
 #Logs and databases#
 *.log
