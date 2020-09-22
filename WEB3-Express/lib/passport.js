@@ -1,10 +1,7 @@
-module.exports = function (app) {
-  const authData = {
-    email: "song_kg@naver.com",
-    password: "1111111",
-    nickname: "song_kg",
-  };
+const db = require("../lib/db");
+const bcrypt = require("bcrypt");
 
+module.exports = function (app) {
   // Passport
   const passport = require("passport"),
     LocalStrategy = require("passport-local").Strategy;
@@ -13,11 +10,12 @@ module.exports = function (app) {
   app.use(passport.session());
 
   passport.serializeUser(function (user, done) {
-    done(null, user.email);
+    done(null, user.id);
   });
 
   passport.deserializeUser(function (id, done) {
-    done(null, authData);
+    let user = db.get("users").find({ id: id }).value();
+    done(null, user);
   });
 
   passport.use(
@@ -26,15 +24,22 @@ module.exports = function (app) {
         usernameField: "email",
         passwordField: "pwd",
       },
-      function (username, password, done) {
-        if (username === authData.email) {
-          if (password === authData.password) {
-            return done(null, authData, { message: "Welcome!" });
-          } else {
-            return done(null, false, { message: "Incorrect password." });
-          }
+      function (email, password, done) {
+        let user = db.get("users").find({ email: email }).value();
+        if (user) {
+          bcrypt.compare(password, user.password, function (err, result) {
+            if (result) {
+              return done(null, user, { message: "Welcome!" });
+            } else {
+              return done(null, false, {
+                message: "Password is not correct.",
+              });
+            }
+          });
         } else {
-          return done(null, false, { message: "Incorrect username." });
+          return done(null, false, {
+            message: "There is no email.",
+          });
         }
       }
     )

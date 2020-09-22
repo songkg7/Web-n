@@ -1,0 +1,36 @@
+{
+  "users": [
+    {
+      "id": "EJp7c43SD",
+      "email": "song_kg@naver.com",
+      "password": "1111",
+      "displayName": "Haril Song"
+    },
+    {
+      "id": "cSPnBX1zI",
+      "email": "joay@naver.com",
+      "password": "1111",
+      "displayName": "joay"
+    },
+    {
+      "id": "0VuMg_-51",
+      "email": "anonymous@gmail.com",
+      "password": "$2b$10$sEcAy1ziLWgls65xsRVyt.io1UARo3AhCQlAQIH8aNe5AgImleema",
+      "displayName": "anonymous"
+    }
+  ],
+  "topics": [
+    {
+      "id": "IDWDp1tkE",
+      "title": "Multi user",
+      "description": "Mul...",
+      "user_id": "EJp7c43SD"
+    },
+    {
+      "id": "R9ehxE1pE",
+      "title": "TypeScript",
+      "description": "Type is..",
+      "user_id": "cSPnBX1zI"
+    }
+  ]
+}

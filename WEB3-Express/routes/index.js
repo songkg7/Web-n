@@ -8,6 +8,8 @@ router.get("/", (req, res) => {
   let feedback = "";
   if (fmsg.success) {
     feedback = fmsg.success[0];
+  } else if (fmsg.error) {
+    feedback = fmsg.error[0];
   }
   let title = "Welcome";
   let description = "Hello, Node.js";

@@ -8,6 +8,7 @@ const session = require("express-session");
 // const FileStore = require("session-file-store")(session);
 const LokiStore = require("connect-loki")(session);
 const helmet = require("helmet");
+const db = require("./lib/db");
 
 app.use(helmet());
 app.use(express.static("public"));
@@ -33,10 +34,8 @@ const authRouter = require("./routes/auth")(passport);
 app.use(flash());
 
 app.get("*", (req, res, next) => {
-  fs.readdir("./data", (err, filelist) => {
-    req.list = filelist;
-    next();
-  });
+  req.list = db.get("topics").value();
+  next();
 });
 
 app.use("/", indexRouter);
