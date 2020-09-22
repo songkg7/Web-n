@@ -1,0 +1,34 @@
+{
+  "topic": [
+    {
+      "id": 1,
+      "title": "lowdb",
+      "description": "lowdb is ...",
+      "author": 1
+    },
+    {
+      "id": 2,
+      "title": "MySQL & MariaDB",
+      "description": "mysql is ...",
+      "author": 1
+    },
+    {
+      "id": "zlfBubxGla",
+      "title": "PostgreSQL",
+      "description": "PostgreSQL is...",
+      "author": "R_l_Hm1O5"
+    }
+  ],
+  "author": [
+    {
+      "id": 1,
+      "name": "egoing",
+      "profile": "developer"
+    },
+    {
+      "id": "R_l_Hm1O5",
+      "name": "taeho",
+      "profile": "data scientist"
+    }
+  ]
+}
